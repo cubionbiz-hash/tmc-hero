@@ -438,7 +438,9 @@ canvas.addEventListener('pointermove',function(e){
     var s=hfov/canvas.clientHeight;
     velYaw=-dx*s;
     yaw+=velYaw;
-    if(e.pointerType!=='touch') pitch=clampPitch(pitch+dy*s);
+    /* 터치도 상하 회전 허용: 세로로 시작한 스와이프는 touch-action:pan-y가
+       페이지 스크롤로 가져가므로, 여기 도달하는 제스처(가로 시작)만 적용됨 */
+    pitch=clampPitch(pitch+dy*s);
     dirty=true;
   }else if(ids.length===2){
     var a=pointers[ids[0]],b=pointers[ids[1]];
@@ -473,8 +475,9 @@ if(Q.get('nologo')) document.getElementById('brand').style.display='none';
 /* ?top=N : 사이트 헤더가 히어로 위에 겹칠 때 상단 UI를 N px 아래로,
    임베드 시 우측 하단 플로팅 버튼(전화/카카오)과 겹치지 않게 셀렉터를 왼쪽으로 */
 (function(){
-  var off=parseInt(Q.get('top')||'0',10)||0;
-  if(off>0&&!MOBILE){
+  /* 데스크톱은 ?top=N(76), 모바일은 ?mtop=N(92) — 겹치는 사이트 헤더 높이만큼 */
+  var off=MOBILE?(parseInt(Q.get('mtop')||'0',10)||0):(parseInt(Q.get('top')||'0',10)||0);
+  if(off>0){
     var base={brand:20,badge:18,zoomCtrl:64};
     Object.keys(base).forEach(function(id){
       var el=document.getElementById(id);

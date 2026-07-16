@@ -1,14 +1,11 @@
-■ 아임웹 메인 페이지 코드 위젯에 붙여넣는 최종 코드 (2026-07-16, 투명 헤더 오버레이 버전)
+■ 아임웹 메인 페이지 코드 위젯에 붙여넣는 최종 코드
+   (2026-07-16 v3: 데스크톱+모바일 모두 투명 헤더 오버레이 / 히어로 풀스크린)
    - 아임웹 관리자 → 메인 페이지 편집 → 히어로 코드 위젯 → 아래 전체를 붙여넣고 저장
 
 <style>
 #tmc-hero-frame{display:block;width:100%;height:calc(100vh - 76px);border:0;}
 #tmc-hero-fade{position:absolute;top:0;left:0;width:100%;height:150px;pointer-events:none;
   background:linear-gradient(to bottom,rgba(248,245,240,.55),rgba(248,245,240,0));}
-@media (max-width:768px){
-  #tmc-hero-frame{height:calc(100vh - 92px);}
-  #tmc-hero-fade{display:none;}
-}
 @media (min-width:769px){
   body.tmc-hero-page #tmc-hero-frame{height:100vh;}
   body#doz_body.tmc-hero-page{padding-top:0 !important;}
@@ -19,9 +16,22 @@
     backdrop-filter:none !important;-webkit-backdrop-filter:none !important;box-shadow:none !important;}
   body.tmc-hero-page:not(.tmc-hdr-solid) #tmc-pc-header::after{opacity:0 !important;}
 }
+@media (max-width:768px){
+  #tmc-hero-frame{height:calc(100vh - 92px);height:calc(100svh - 92px);}
+  body.tmc-hero-page #tmc-hero-frame{height:100vh;height:100svh;}
+  #tmc-hero-fade{height:110px;
+    background:linear-gradient(to bottom,rgba(248,245,240,.5),rgba(248,245,240,0));}
+  body.tmc-hero-page #tmc-topbar,body.tmc-hero-page #tmc-main-nav{
+    transition:background .35s ease,box-shadow .35s ease !important;}
+  body.tmc-hero-page #tmc-topbar::after{transition:opacity .35s ease !important;}
+  body.tmc-hero-page:not(.tmc-hdr-solid) #tmc-topbar{background:transparent !important;box-shadow:none !important;}
+  body.tmc-hero-page:not(.tmc-hdr-solid) #tmc-topbar::after{opacity:0 !important;}
+  body.tmc-hero-page:not(.tmc-hdr-solid) #tmc-main-nav{background:transparent !important;
+    border-bottom:0 !important;box-shadow:none !important;}
+}
 </style>
 <div id="tmc-hero-wrap" style="position:relative;">
-  <iframe id="tmc-hero-frame" src="https://cubionbiz-hash.github.io/tmc-hero/?nologo=1&top=76"
+  <iframe id="tmc-hero-frame" src="https://cubionbiz-hash.github.io/tmc-hero/?nologo=1&top=76&mtop=92"
     allow="fullscreen" title="태민 큐비클 360 쇼룸"></iframe>
   <div id="tmc-hero-fade"></div>
 </div>
@@ -35,11 +45,16 @@
     p.style.marginTop='0';p.style.marginBottom='0';p.style.minHeight='0';
     if(p.clientWidth>=window.innerWidth*0.98)break;
   }
-  if(window.matchMedia('(min-width:769px)').matches){
-    document.body.classList.add('tmc-hero-page');
-    var onS=function(){document.body.classList.toggle('tmc-hdr-solid',(window.scrollY||document.documentElement.scrollTop||0)>40);};
-    window.addEventListener('scroll',onS,{passive:true});
-    onS();
-  }
+  document.body.classList.add('tmc-hero-page');
+  var onS=function(){document.body.classList.toggle('tmc-hdr-solid',(window.scrollY||document.documentElement.scrollTop||0)>40);};
+  window.addEventListener('scroll',onS,{passive:true});
+  onS();
+  /* 남은 상단 오프셋 제거: 히어로 상단을 화면 y=0에 맞춤 */
+  var fix=function(){
+    w.style.marginTop='0px';
+    var top=w.getBoundingClientRect().top+(window.scrollY||document.documentElement.scrollTop||0);
+    if(top>0&&top<300) w.style.marginTop=(-top)+'px';
+  };
+  fix(); window.addEventListener('resize',fix); setTimeout(fix,300);
 })();
 </script>
