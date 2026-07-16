@@ -120,12 +120,19 @@
     #brand img{height:26px;}
     /* 줌 버튼 숨김: 핀치·더블탭으로 대체 */
     #zoomCtrl{display:none;}
-    /* 캡션이 색상 카드 패널에 가리지 않게 위로 */
-    #caption{left:18px;bottom:176px;}
-    #caption .l3{margin-top:6px;}
+    /* 캡션: 골드 라인 포인트 + 크고 또렷하게, 색상 카드 패널에 가리지 않게 위로 */
+    #caption{left:18px;bottom:182px;border-left:3px solid #d4af6a;padding-left:14px;}
+    #caption .l1{font-size:10.5px;}
+    #caption .l2{font-size:23px;font-weight:800;letter-spacing:-.02em;
+      text-shadow:0 2px 14px rgba(0,0,0,.55);}
+    #caption .l3{margin-top:7px;font-size:12.5px;color:rgba(255,255,255,.94);
+      text-shadow:0 1px 8px rgba(0,0,0,.5);}
     /* 우측 하단 전화/카카오 플로팅 버튼 영역(약 90px)을 피함 */
     #bottom{flex-direction:column-reverse;align-items:flex-start;padding:14px 88px 18px 18px;gap:12px;}
-    #cta{font-size:12.5px;padding:11px 20px;}
+    /* CTA: 사이트 헤더와 같은 골드 톤 */
+    #cta{font-size:13.5px;font-weight:800;padding:13px 24px;color:#171512;
+      background:linear-gradient(135deg,#e9cf9a,#c9a96e);
+      box-shadow:0 6px 18px rgba(0,0,0,.35);}
     #sel{padding:9px 11px;gap:8px;}
     .s .sw{width:58px;height:37px;}
     .s .nm{font-size:10.5px;}

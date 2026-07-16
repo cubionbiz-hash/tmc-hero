@@ -1,5 +1,5 @@
 ■ 아임웹 메인 페이지 코드 위젯에 붙여넣는 최종 코드
-   (2026-07-16 v3: 데스크톱+모바일 모두 투명 헤더 오버레이 / 히어로 풀스크린)
+   (2026-07-16 v4: 투명 상태 모바일 메뉴 글자색 진하게 추가)
    - 아임웹 관리자 → 메인 페이지 편집 → 히어로 코드 위젯 → 아래 전체를 붙여넣고 저장
 
 <style>
@@ -28,6 +28,10 @@
   body.tmc-hero-page:not(.tmc-hdr-solid) #tmc-topbar::after{opacity:0 !important;}
   body.tmc-hero-page:not(.tmc-hdr-solid) #tmc-main-nav{background:transparent !important;
     border-bottom:0 !important;box-shadow:none !important;}
+  /* 투명 상태에서 메뉴 글자 또렷하게 */
+  body.tmc-hero-page:not(.tmc-hdr-solid) .tmc-nav-item{color:#3a332b !important;font-weight:700 !important;
+    text-shadow:0 1px 3px rgba(255,255,255,.55) !important;}
+  body.tmc-hero-page:not(.tmc-hdr-solid) .tmc-nav-item.active{color:#111 !important;}
 }
 </style>
 <div id="tmc-hero-wrap" style="position:relative;">
