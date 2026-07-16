@@ -82,9 +82,11 @@
   #bottom{position:absolute;left:0;right:0;bottom:0;z-index:6;
     display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
     padding:18px 26px 22px;transition-delay:.45s;}
-  #cta{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);
-    color:#171512;font-size:13.5px;font-weight:700;padding:12px 24px;
-    border-radius:99px;text-decoration:none;white-space:nowrap;}
+  #cta{display:inline-flex;align-items:center;gap:8px;
+    background:linear-gradient(135deg,#e9cf9a,#c9a96e);
+    color:#171512;font-size:13.5px;font-weight:800;padding:12px 24px;
+    border-radius:99px;text-decoration:none;white-space:nowrap;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);}
   /* ---- 조작 가이드 칩 (하단 중앙, 리빌 후 잠시 표시) ---- */
   #guide{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:6;
     display:flex;gap:8px;transition-delay:.6s;}
@@ -131,10 +133,7 @@
       text-shadow:0 1px 8px rgba(0,0,0,.5);}
     /* 우측 하단 전화/카카오 플로팅 버튼 영역(약 90px)을 피하고, CTA를 살짝 위로 */
     #bottom{flex-direction:column-reverse;align-items:flex-start;padding:14px 88px 30px 18px;gap:12px;}
-    /* CTA: 사이트 헤더와 같은 골드 톤 */
-    #cta{font-size:13.5px;font-weight:800;padding:13px 24px;color:#171512;
-      background:linear-gradient(135deg,#e9cf9a,#c9a96e);
-      box-shadow:0 6px 18px rgba(0,0,0,.35);}
+    #cta{padding:13px 24px;}
     #sel{padding:9px 11px;gap:8px;}
     .s .sw{width:58px;height:37px;}
     .s .nm{font-size:10.5px;}
