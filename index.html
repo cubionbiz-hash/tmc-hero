@@ -118,9 +118,16 @@
   @keyframes ldp{50%{opacity:.35;}}
   @media (max-width:768px){
     #brand img{height:26px;}
-    #caption{left:18px;bottom:132px;}
-    #bottom{flex-direction:column-reverse;align-items:flex-start;padding:14px 18px 18px;}
-    .s .sw{width:60px;height:38px;}
+    /* 줌 버튼 숨김: 핀치·더블탭으로 대체 */
+    #zoomCtrl{display:none;}
+    /* 캡션이 색상 카드 패널에 가리지 않게 위로 */
+    #caption{left:18px;bottom:176px;}
+    #caption .l3{margin-top:6px;}
+    /* 우측 하단 전화/카카오 플로팅 버튼 영역(약 90px)을 피함 */
+    #bottom{flex-direction:column-reverse;align-items:flex-start;padding:14px 88px 18px 18px;gap:12px;}
+    #cta{font-size:12.5px;padding:11px 20px;}
+    #sel{padding:9px 11px;gap:8px;}
+    .s .sw{width:58px;height:37px;}
     .s .nm{font-size:10.5px;}
   }
 </style>
