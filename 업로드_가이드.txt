@@ -1,0 +1,49 @@
+■ TMC 360 히어로 — GitHub 업로드 & 아임웹 삽입 가이드
+
+[1단계] GitHub 저장소 만들기
+  1. github.com 에 cubionbiz-hash 계정으로 로그인
+  2. 우측 상단 + → New repository
+  3. Repository name: tmc-hero
+  4. Public 선택 (Pages 무료 사용 조건) → Create repository
+
+[2단계] 파일 업로드
+  1. 만들어진 저장소 화면에서 "uploading an existing file" 클릭
+     (또는 Add file → Upload files)
+  2. 이 폴더(tmc-hero) 안의 내용물을 전부 끌어다 놓기:
+     - index.html
+     - img 폴더 (jpg 15개 + logo.png)
+     ※ tmc-hero 폴더 자체가 아니라 "안의 내용물"을 올려야 합니다
+  3. 하단 Commit changes 클릭 (업로드 약 16MB, 2~4분)
+
+[3단계] GitHub Pages 켜기
+  1. 저장소 상단 Settings → 왼쪽 메뉴 Pages
+  2. Source: "Deploy from a branch"
+  3. Branch: main / (root) 선택 → Save
+  4. 1~2분 뒤 상단에 주소가 표시됨:
+     https://cubionbiz-hash.github.io/tmc-hero/
+  5. 이 주소를 브라우저에서 열어 히어로가 잘 나오는지 확인
+
+[4단계] 아임웹에 삽입
+  1. 아임웹 관리자 → 메인 페이지 편집
+  2. 기존 히어로 섹션(제목+렌더 이미지)을 숨기거나 삭제
+  3. 맨 위에 "코드" 위젯 추가 → 아래 코드 붙여넣기:
+
+<iframe src="https://cubionbiz-hash.github.io/tmc-hero/"
+  style="display:block;width:100%;height:calc(100vh - 76px);border:0;"
+  allow="fullscreen" title="태민 큐비클 360 쇼룸"></iframe>
+
+  4. 섹션 여백은 0으로, 폭은 "화면 전체(와이드)"로 설정
+  ※ 76px = 헤더 높이 추정치. 삽입 후 화면이 살짝 짧거나 길면
+     이 숫자만 조절하면 됩니다 (알려주시면 정확히 계산해 드림)
+
+[수정이 필요할 때]
+  index.html 이나 이미지를 고친 뒤 GitHub에서 같은 이름으로
+  다시 업로드(덮어쓰기)하면 사이트에 자동 반영됩니다.
+  아임웹은 다시 만질 필요 없음.
+
+[테스트 주소 옵션 (주소 뒤에 붙여서 사용)]
+  ?noveil=1        흐림 인트로 없이 바로 시작
+  ?scene=green     그린 씬으로 시작
+  ?tier=2048       저해상도 강제 (속도 테스트용)
+  ?hd=0            8192 고화질 자동 교체 끄기 (데스크톱)
+  ?nologo=1        좌측 상단 로고 숨김

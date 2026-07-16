@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>태민 큐비클 360° 쇼룸</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{background:#141210;overflow:hidden;
+    font-family:"Pretendard Variable",Pretendard,-apple-system,"Malgun Gothic",sans-serif;color:#fff;
+    -webkit-tap-highlight-color:transparent;}
+  #hero{position:relative;width:100%;height:100%;overflow:hidden;}
+
+  /* 로딩 포스터 (64px 블러업) */
+  #poster{position:absolute;inset:-30px;background-size:cover;background-position:center;
+    filter:blur(14px);transform:scale(1.04);}
+  #glcanvas{position:absolute;inset:0;width:100%;height:100%;display:block;
+    opacity:0;transition:opacity .8s ease;cursor:grab;touch-action:pan-y;}
+  #glcanvas.ready{opacity:1;}
+  #glcanvas.grabbing{cursor:grabbing;}
+  #fallback{position:absolute;inset:0;display:none;}
+  #fallback img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    opacity:0;transition:opacity 1.2s ease;}
+  #fallback img.show{opacity:1;}
+
+  /* 씬별 가독성 스크림 */
+  #scrim{position:absolute;inset:0;pointer-events:none;transition:opacity 1.7s ease;
+    background:linear-gradient(0deg,rgba(15,13,10,.42) 0%,transparent 26%),
+      linear-gradient(180deg,rgba(15,13,10,.22) 0%,transparent 15%);}
+
+  /* ---- B-7 리빌 베일 ---- */
+  #veilWrap{position:absolute;inset:0;z-index:8;transition:opacity 1.2s cubic-bezier(.4,0,.2,1);}
+  #veilWrap.off{opacity:0;pointer-events:none;}
+  #veilBlur{position:absolute;inset:0;background:rgba(15,13,10,.34);
+    backdrop-filter:blur(16px) brightness(.7) saturate(.85);
+    -webkit-backdrop-filter:blur(16px) brightness(.7) saturate(.85);}
+  #invite{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    text-align:center;white-space:nowrap;}
+  #invite .ring{width:76px;height:76px;margin:0 auto 22px;border-radius:50%;
+    border:1.5px solid rgba(255,255,255,.75);display:flex;align-items:center;
+    justify-content:center;font-size:13px;letter-spacing:1px;font-weight:700;
+    animation:pulse 2.2s ease infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(229,197,138,.5);}
+    50%{box-shadow:0 0 0 18px rgba(229,197,138,0);}}
+  #invite .msg{font-size:clamp(15px,2.2vw,20px);font-weight:600;letter-spacing:.5px;
+    text-shadow:0 2px 18px rgba(0,0,0,.5);}
+  #invite .msg2{margin-top:10px;font-size:clamp(11px,1.5vw,13px);color:rgba(255,255,255,.75);}
+  @media (prefers-reduced-motion:reduce){ #invite .ring{animation:none;} }
+
+  /* ---- 브랜드 (실제 로고, 흰색 반전) ---- */
+  #brand{position:absolute;top:20px;left:24px;z-index:9;line-height:1;}
+  #brand img{height:34px;width:auto;display:block;
+    filter:brightness(0) invert(1) drop-shadow(0 2px 10px rgba(0,0,0,.4));}
+  #brand .gold{display:inline-block;width:26px;height:2px;background:#e5c58a;
+    margin-top:8px;}
+  #invite .eyebrow{font-size:10px;letter-spacing:4px;color:#e5c58a;font-weight:700;
+    margin-bottom:16px;}
+
+  /* ---- 리빌 후 UI ---- */
+  .post{opacity:0;transform:translateY(14px);transition:opacity .8s ease,transform .8s ease;}
+  .revealed .post{opacity:1;transform:none;}
+  #badge{position:absolute;top:18px;right:18px;z-index:6;display:flex;align-items:center;gap:8px;
+    background:rgba(20,18,15,.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    padding:8px 14px;border-radius:99px;font-size:12px;letter-spacing:1px;transition-delay:.1s;}
+  /* ---- 줌 버튼 ---- */
+  #zoomCtrl{position:absolute;top:64px;right:18px;z-index:6;display:flex;
+    flex-direction:column;gap:8px;transition-delay:.2s;}
+  .zb{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.35);
+    background:rgba(20,18,15,.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    color:#fff;font-size:18px;font-weight:600;cursor:pointer;line-height:1;
+    display:flex;align-items:center;justify-content:center;user-select:none;}
+  .zb:hover{border-color:#e5c58a;}
+  #caption{position:absolute;left:26px;bottom:112px;z-index:6;transition-delay:.25s;}
+  #caption .l1{font-size:10.5px;letter-spacing:3.5px;color:#e5c58a;font-weight:700;}
+  #caption .l2{margin-top:9px;font-size:clamp(16px,2.4vw,22px);font-weight:700;
+    text-shadow:0 2px 16px rgba(0,0,0,.45);}
+  #caption .l3{margin-top:8px;font-size:clamp(11.5px,1.4vw,13px);font-weight:500;
+    color:rgba(255,255,255,.78);text-shadow:0 1px 10px rgba(0,0,0,.4);}
+  #bottom{position:absolute;left:0;right:0;bottom:0;z-index:6;
+    display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
+    padding:18px 26px 22px;transition-delay:.45s;}
+  #cta{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);
+    color:#171512;font-size:13.5px;font-weight:700;padding:12px 24px;
+    border-radius:99px;text-decoration:none;white-space:nowrap;}
+  /* ---- 조작 가이드 칩 (하단 중앙, 리빌 후 잠시 표시) ---- */
+  #guide{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:6;
+    display:flex;gap:8px;transition-delay:.6s;}
+  #guide .g{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;
+    color:rgba(255,255,255,.88);background:rgba(20,18,15,.38);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,.16);border-radius:99px;padding:8px 15px;
+    transition:opacity 1s ease;}
+  #guide .g svg{width:15px;height:15px;stroke:#e5c58a;fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  #guide.dim .g{opacity:.35;}
+  #guide:hover .g{opacity:1;}
+  @media (max-width:1000px){ #guide{display:none;} }
+  /* ---- 색상 셀렉터: 컬러웨이 공간 미리보기 카드 ---- */
+  #sel{display:flex;gap:10px;padding:11px 13px;border-radius:18px;
+    background:rgba(255,255,255,.13);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.22);}
+  .s{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;
+    background:none;border:0;font-family:inherit;opacity:.75;transition:.25s;user-select:none;}
+  .s.ready{opacity:.88;}
+  .s:hover{opacity:1;}
+  .s .sw{width:74px;height:46px;border-radius:10px;background-size:cover;background-position:center;
+    box-shadow:0 3px 12px rgba(0,0,0,.4), inset 0 0 0 1px rgba(255,255,255,.28);
+    transition:.25s;}
+  .s .nm{font-size:11.5px;font-weight:700;color:#fff;letter-spacing:1px;
+    text-shadow:0 1px 6px rgba(0,0,0,.5);}
+  .s.on{opacity:1;}
+  .s.on .sw{box-shadow:0 0 0 2.5px #e5c58a, 0 0 20px rgba(229,197,138,.5);transform:scale(1.05);}
+  .s.on .nm{color:#e5c58a;}
+  .s.loading .sw{animation:ldp 1.1s ease infinite;}
+  @keyframes ldp{50%{opacity:.35;}}
+  @media (max-width:768px){
+    #brand img{height:26px;}
+    #caption{left:18px;bottom:132px;}
+    #bottom{flex-direction:column-reverse;align-items:flex-start;padding:14px 18px 18px;}
+    .s .sw{width:60px;height:38px;}
+    .s .nm{font-size:10.5px;}
+  }
+</style>
+</head>
+<body>
+<div id="hero">
+  <div id="poster"></div>
+  <canvas id="glcanvas"></canvas>
+  <div id="fallback"></div>
+  <div id="scrim"></div>
+
+  <div id="brand">
+    <img src="img/logo.png" alt="태민 큐비클">
+    <span class="gold"></span>
+  </div>
+  <div id="badge" class="post"><b>360°</b>&nbsp;LIVE</div>
+  <div id="zoomCtrl" class="post">
+    <button class="zb" id="zin" title="확대">+</button>
+    <button class="zb" id="zout" title="축소">−</button>
+  </div>
+  <div id="caption" class="post">
+    <div class="l1">TAEMIN CUBICLE — 360° SHOWROOM</div>
+    <div class="l2">화장실은, 건물의 첫인상이 됩니다</div>
+    <div class="l3">20년 이상의 화장실 칸막이 전문기업 태민큐비클</div>
+  </div>
+  <div id="bottom" class="post">
+    <a id="cta" href="https://tmcubicle.kr/Contact" target="_top">화장실 칸막이(큐비클) 문의하기 →</a>
+    <div id="sel"></div>
+  </div>
+  <div id="guide" class="post">
+    <span class="g"><svg viewBox="0 0 24 24"><path d="M2 12h20M6 8l-4 4 4 4M18 8l4 4-4 4"/></svg>드래그로 둘러보기</span>
+    <span class="g"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6M11 8v6"/></svg>더블클릭 · 확대</span>
+    <span class="g"><svg viewBox="0 0 24 24"><circle cx="8" cy="10" r="4.5"/><circle cx="16" cy="10" r="4.5"/><circle cx="12" cy="16" r="4.5"/></svg>색상 바꾸기</span>
+  </div>
+
+  <div id="veilWrap">
+    <div id="veilBlur"></div>
+    <div id="invite">
+      <div class="eyebrow">TAEMIN CUBICLE</div>
+      <div class="ring">360°</div>
+      <div class="msg" id="inviteMsg">마우스를 움직여 공간을 깨워보세요</div>
+      <div class="msg2">드래그하면 360°로 둘러볼 수 있습니다</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ===== 설정 ===== */
+var SCENES=[
+  {id:'white', name:'화이트', dot:'#e8e2d6', scrim:1.0},
+  {id:'bronze',name:'브론즈', dot:'#8a6a4e', scrim:0.72},
+  {id:'green', name:'그린',  dot:'#1f5c33', scrim:0.62}
+];
+var IMG_BASE='img/';
+var Q=new URLSearchParams(location.search);
+var MOBILE=window.matchMedia('(pointer:coarse)').matches;
+var REDUCED=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+var TIER=(MOBILE&&Math.min(screen.width,window.innerWidth)<900)?2048:4096;
+var qt=parseInt(Q.get('tier')||'0',10); if(qt===2048||qt===4096) TIER=qt;
+var DPR_CAP=MOBILE?1.5:2;
+var TRANS_MS=1700, WAKE_MS=1600;
+var AUTOROT=-1.5*Math.PI/180;
+var START_YAW=-110*Math.PI/180;   /* 큐비클 도어 정면 */
+var startIdx=Math.max(0,SCENES.map(function(s){return s.id;}).indexOf(Q.get('scene')||'white'));
+
+/* ===== DOM ===== */
+var hero=document.getElementById('hero');
+var canvas=document.getElementById('glcanvas');
+var poster=document.getElementById('poster');
+var scrim=document.getElementById('scrim');
+var fallbackEl=document.getElementById('fallback');
+var veil=document.getElementById('veilWrap');
+var inviteMsg=document.getElementById('inviteMsg');
+var selEl=document.getElementById('sel');
+if(MOBILE) inviteMsg.textContent='화면을 터치해 공간을 깨워보세요';
+poster.style.backgroundImage='url('+IMG_BASE+SCENES[startIdx].id+'_poster.jpg)';
+
+/* ===== 셰이더 (리플 웨이브 전용; 투영은 Pannellum 수학 참고, MIT) ===== */
+var VS='attribute vec2 aPos;varying vec2 vUV;void main(){gl_Position=vec4(aPos,0.0,1.0);vUV=aPos;}';
+var FS=[
+'precision highp float;',
+'varying vec2 vUV;',
+'uniform float uAspect,uYaw,uPitch,uF,uProgress;',
+'uniform sampler2D uTexA,uTexB;',
+'const float PI=3.141592653589793;',
+'vec2 dirToUV(float lambda,float phi){',
+'  lambda=mod(lambda+PI,2.0*PI)-PI;',
+'  return vec2((lambda+PI)/(2.0*PI),0.5-phi/PI);',
+'}',
+'void main(){',
+'  float x=vUV.x*uAspect;',
+'  float y=vUV.y;',
+'  float sint=sin(uPitch),cost=cos(uPitch);',
+'  float a=uF*cost-y*sint;',
+'  float root=sqrt(x*x+a*a);',
+'  float lambda=atan(x/root,a/root)+uYaw;',
+'  float phi=atan((y*cost+uF*sint)/root);',
+'  float p=uProgress;',
+'  float r=length(vec2(x/uF*1.4,y));',
+'  float R=p*2.2;',
+'  float live=step(0.001,p)*step(p,0.999);',
+'  float ring=exp(-pow((r-R)*6.0,2.0))*live;',
+'  float d=ring*0.05*sin(28.0*(r-R));',
+'  vec3 A=texture2D(uTexA,dirToUV(lambda+d,phi+d*0.6)).rgb;',
+'  vec3 B=texture2D(uTexB,dirToUV(lambda+d,phi+d*0.6)).rgb;',
+'  float m=smoothstep(R,R-0.25,r);',
+'  vec3 col=mix(A,B,m);',
+'  col+=vec3(1.0,0.82,0.45)*ring*0.32;',
+'  gl_FragColor=vec4(col,1.0);',
+'}'].join('\n');
+
+/* ===== WebGL ===== */
+var gl=null,prog=null,uni={},quad=null;
+function compileShader(t,src){
+  var s=gl.createShader(t); gl.shaderSource(s,src); gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){ console.error('SHADER',gl.getShaderInfoLog(s)); return null; }
+  return s;
+}
+function initGL(){
+  gl=canvas.getContext('webgl',{alpha:false,depth:false,antialias:false})
+    ||canvas.getContext('experimental-webgl',{alpha:false,depth:false});
+  if(!gl) return false;
+  var fs=FS;
+  var pf=gl.getShaderPrecisionFormat&&gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER,gl.HIGH_FLOAT);
+  if(pf&&pf.precision<1) fs=fs.replace('precision highp float','precision mediump float');
+  var v=compileShader(gl.VERTEX_SHADER,VS),f=compileShader(gl.FRAGMENT_SHADER,fs);
+  if(!v||!f) return false;
+  prog=gl.createProgram();
+  gl.attachShader(prog,v); gl.attachShader(prog,f); gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog,gl.LINK_STATUS)) return false;
+  gl.useProgram(prog);
+  quad=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,quad);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,1,1,1,1,-1,-1,1,1,-1,-1,-1]),gl.STATIC_DRAW);
+  var loc=gl.getAttribLocation(prog,'aPos');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  ['uAspect','uYaw','uPitch','uF','uProgress','uTexA','uTexB'].forEach(function(n){
+    uni[n]=gl.getUniformLocation(prog,n);
+  });
+  gl.uniform1i(uni.uTexA,0); gl.uniform1i(uni.uTexB,1);
+  return true;
+}
+
+/* ===== 씬 로딩 ===== */
+var texs=[null,null,null], loaded=[false,false,false], pills=[], fallbackOn=false;
+function loadScene(i,cb){
+  var img=new Image();
+  /* 이미지가 같은 저장소(동일 출처)에 있으므로 crossOrigin 불필요 */
+  img.onload=function(){
+    if(!gl) return;
+    var t=gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D,t);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+    try{
+      gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,img);
+    }catch(err){
+      /* file://로 직접 열면 보안 정책상 텍스처 업로드가 차단됨 → 정적 폴백으로 전환 */
+      console.error('texture blocked (file:// security), falling back',err);
+      if(!fallbackOn){ fallbackOn=true; canvas.style.display='none'; initFallback(); }
+      return;
+    }
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    /* 밉맵 금지: equirect 이음새 아티팩트 방지 */
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+    texs[i]=t; loaded[i]=true;
+    pills[i].classList.remove('loading'); pills[i].classList.add('ready');
+    dirty=true;
+    if(cb) cb();
+  };
+  img.onerror=function(){ pills[i].classList.remove('loading'); };
+  img.src=IMG_BASE+SCENES[i].id+'_'+TIER+'.jpg';
+}
+
+/* ===== HD 업그레이드: 데스크톱은 로드 후 8192 원본급으로 조용히 교체 ===== */
+var HD_TIER=8192, hdDone=[false,false,false];
+function canHD(){
+  return !MOBILE && TIER===4096 && !fallbackOn && gl
+    && gl.getParameter(gl.MAX_TEXTURE_SIZE)>=HD_TIER && Q.get('hd')!=='0';
+}
+function upgradeScene(i){
+  if(hdDone[i]) return;
+  hdDone[i]=true;
+  var img=new Image();
+  img.onload=function(){
+    if(!gl||fallbackOn) return;
+    var t=gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D,t);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+    try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,img); }
+    catch(err){ gl.deleteTexture(t); return; }
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+    var swap=function(){
+      if(busy||waking){ setTimeout(swap,400); return; } /* 전환 중 교체 금지 */
+      var old=texs[i]; texs[i]=t;
+      if(old) gl.deleteTexture(old);
+      dirty=true;
+      window.__hd=(window.__hd||0)+1; /* 검증용 카운터 */
+    };
+    swap();
+  };
+  /* 8192 파일이 없거나 실패해도 4096 그대로 사용 */
+  img.src=IMG_BASE+SCENES[i].id+'_'+HD_TIER+'.jpg';
+}
+
+/* ===== 카메라/상태 ===== */
+var cur=startIdx, target=-1, transT0=0, waking=false, wakeT0=0, busy=false;
+var yaw=START_YAW, pitch=0, hfov=100*Math.PI/180, hfovTarget=hfov;
+var MIN_FOV=45*Math.PI/180, MAX_FOV=110*Math.PI/180;
+function setHfovTarget(t){ hfovTarget=Math.max(MIN_FOV,Math.min(MAX_FOV,t)); dirty=true; }
+var dirty=true, revealed=false, lastInteract=0;
+var velYaw=0, dragging=false;
+function easeInOut(t){ return t<0.5?2*t*t:-1+(4-2*t)*t; }
+function clampPitch(p){ var l=Math.PI/2-0.08; return Math.max(-l,Math.min(l,p)); }
+
+function setScrim(i){ scrim.style.opacity=SCENES[i].scrim; }
+setScrim(startIdx);
+
+function go(i){
+  if(busy||waking||i===cur||!loaded[i]||!revealed) return;
+  busy=true; target=i; transT0=performance.now();
+  pills.forEach(function(p,k){ p.classList.toggle('on',k===i); });
+  setScrim(i);
+  lastInteract=performance.now();
+  dirty=true;
+}
+function wake(){
+  if(REDUCED) return;             /* 모션 최소화 사용자: 리플 없이 페이드만 */
+  waking=true; wakeT0=performance.now(); dirty=true;
+}
+
+/* ===== 렌더 루프 ===== */
+var lastT=performance.now();
+function frame(now){
+  requestAnimationFrame(frame);
+  if(document.hidden||!gl||!prog||!loaded[cur]) return;
+  var dt=Math.min(0.1,(now-lastT)/1000); lastT=now;
+
+  var idleFor=(now-lastInteract)/1000;
+  if(revealed&&!REDUCED&&!dragging&&target<0&&!waking&&idleFor>2){
+    yaw+=AUTOROT*dt; dirty=true;
+  }
+  if(!dragging&&Math.abs(velYaw)>0.0004){
+    yaw+=velYaw; velYaw*=0.93; dirty=true;
+  }
+  if(Math.abs(hfovTarget-hfov)>0.0004){
+    hfov+=(hfovTarget-hfov)*Math.min(1,dt*8); dirty=true;
+  }
+  var p=0;
+  if(waking){
+    var wt=(now-wakeT0)/WAKE_MS;
+    if(wt>=1){ waking=false; } else p=easeInOut(wt);
+    dirty=true;
+  }else if(target>=0){
+    var t=(now-transT0)/TRANS_MS;
+    if(t>=1){ cur=target; target=-1; busy=false; p=0; }
+    else p=easeInOut(t);
+    dirty=true;
+  }
+  if(!dirty) return;
+  dirty=false;
+  var w=canvas.width,h=canvas.height,aspect=w/h;
+  gl.viewport(0,0,w,h);
+  gl.uniform1f(uni.uAspect,aspect);
+  gl.uniform1f(uni.uYaw,yaw);
+  gl.uniform1f(uni.uPitch,pitch);
+  gl.uniform1f(uni.uF,aspect/Math.tan(hfov*0.5));
+  gl.uniform1f(uni.uProgress,p);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D,texs[cur]);
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D,(target>=0?texs[target]:texs[cur]));
+  gl.drawArrays(gl.TRIANGLES,0,6);
+}
+
+/* ===== 입력 (휠 없음 — 페이지 스크롤 보존 / 모바일 세로 = 스크롤 통과)
+   확대: +/− 버튼, 더블클릭 토글, 모바일 핀치 ===== */
+var lastX=0,lastY=0,pointers={},pinchD=0;
+canvas.addEventListener('pointerdown',function(e){
+  canvas.setPointerCapture(e.pointerId);
+  pointers[e.pointerId]=[e.clientX,e.clientY];
+  var ids=Object.keys(pointers);
+  if(ids.length===1){
+    dragging=true; canvas.classList.add('grabbing');
+    lastX=e.clientX; lastY=e.clientY; velYaw=0;
+  }else if(ids.length===2){
+    dragging=false;
+    var a=pointers[ids[0]],b=pointers[ids[1]];
+    pinchD=Math.hypot(a[0]-b[0],a[1]-b[1]);
+  }
+  lastInteract=performance.now();
+  markMove();
+});
+canvas.addEventListener('pointermove',function(e){
+  if(!(e.pointerId in pointers)) return;
+  pointers[e.pointerId]=[e.clientX,e.clientY];
+  var ids=Object.keys(pointers);
+  if(ids.length===1&&dragging){
+    var dx=e.clientX-lastX, dy=e.clientY-lastY;
+    lastX=e.clientX; lastY=e.clientY;
+    var s=hfov/canvas.clientHeight;
+    velYaw=-dx*s;
+    yaw+=velYaw;
+    if(e.pointerType!=='touch') pitch=clampPitch(pitch+dy*s);
+    dirty=true;
+  }else if(ids.length===2){
+    var a=pointers[ids[0]],b=pointers[ids[1]];
+    var d=Math.hypot(a[0]-b[0],a[1]-b[1]);
+    if(pinchD>0){
+      setHfovTarget(hfovTarget*pinchD/d);
+      hfov=hfovTarget;
+    }
+    pinchD=d;
+  }
+  lastInteract=performance.now();
+});
+function endDrag(e){
+  if(e&&(e.pointerId in pointers)) delete pointers[e.pointerId];
+  if(Object.keys(pointers).length===0){
+    dragging=false; canvas.classList.remove('grabbing'); pinchD=0;
+  }
+}
+canvas.addEventListener('pointerup',endDrag);
+canvas.addEventListener('pointercancel',endDrag);
+canvas.addEventListener('dblclick',function(){
+  setHfovTarget(hfovTarget>80*Math.PI/180 ? 62*Math.PI/180 : 100*Math.PI/180);
+  lastInteract=performance.now();
+});
+document.getElementById('zin').addEventListener('click',function(){
+  setHfovTarget(hfovTarget-15*Math.PI/180); lastInteract=performance.now();
+});
+document.getElementById('zout').addEventListener('click',function(){
+  setHfovTarget(hfovTarget+15*Math.PI/180); lastInteract=performance.now();
+});
+if(Q.get('nologo')) document.getElementById('brand').style.display='none';
+
+/* ===== 리빌 ===== */
+var armed=false, moved=0, pmX=null, pmY=null, pendingReveal=false;
+setTimeout(function(){ armed=true; },5000);
+function reveal(){
+  if(revealed) return;
+  if(!loaded[cur]){ pendingReveal=true; return; }
+  revealed=true;
+  veil.classList.add('off');
+  hero.classList.add('revealed');
+  lastInteract=performance.now();
+  wake();
+}
+document.addEventListener('mousemove',function(e){
+  if(revealed||!armed) return;
+  if(pmX!==null) moved+=Math.abs(e.clientX-pmX)+Math.abs(e.clientY-pmY);
+  pmX=e.clientX; pmY=e.clientY;
+  if(moved>60) reveal();
+});
+function markMove(){ if(!revealed&&armed) reveal(); }
+/* 클릭/터치는 5초 대기와 무관하게 즉시 리빌 */
+document.addEventListener('mousedown',function(){ reveal(); });
+document.addEventListener('touchstart',function(){ reveal(); },{passive:true});
+setTimeout(reveal,11000);
+if(Q.get('noveil')) setTimeout(reveal,50);
+
+/* ===== 재질 pill ===== */
+SCENES.forEach(function(s,i){
+  var b=document.createElement('button');
+  b.className='s loading'+(i===startIdx?' on':'');
+  b.innerHTML='<span class="sw" style="background-color:'+s.dot+
+    ';background-image:url('+IMG_BASE+'thumb_'+s.id+'.jpg)"></span><span class="nm">'+s.name+'</span>';
+  b.addEventListener('click',function(){ go(i); });
+  selEl.appendChild(b);
+  pills.push(b);
+});
+/* 가이드 칩: 리빌 9초 후 은은하게 */
+(function(){
+  var gd=document.getElementById('guide');
+  var iv=setInterval(function(){
+    if(revealed){ clearInterval(iv); setTimeout(function(){ gd.classList.add('dim'); },9000); }
+  },300);
+})();
+
+/* ===== 리사이즈/가시성/컨텍스트 ===== */
+function resize(){
+  var dpr=Math.min(window.devicePixelRatio||1,DPR_CAP);
+  var w=Math.round(canvas.clientWidth*dpr),h=Math.round(canvas.clientHeight*dpr);
+  if(w!==canvas.width||h!==canvas.height){ canvas.width=w; canvas.height=h; dirty=true; }
+}
+window.addEventListener('resize',resize);
+document.addEventListener('visibilitychange',function(){ lastT=performance.now(); dirty=true; });
+canvas.addEventListener('webglcontextlost',function(e){ e.preventDefault(); });
+canvas.addEventListener('webglcontextrestored',function(){
+  if(!initGL()) return;
+  resize();
+  texs=[null,null,null]; loaded=[false,false,false]; hdDone=[false,false,false];
+  SCENES.forEach(function(s,i){
+    pills[i].classList.add('loading');
+    loadScene(i,function(){ if(canHD()) upgradeScene(i); });
+  });
+});
+
+/* ===== 폴백 (WebGL 불가) ===== */
+function initFallback(){
+  fallbackEl.style.display='block';
+  var imgs=[];
+  SCENES.forEach(function(s,i){
+    var im=document.createElement('img');
+    im.src=IMG_BASE+s.id+'_'+TIER+'.jpg';
+    if(i===startIdx) im.className='show';
+    fallbackEl.appendChild(im);
+    imgs.push(im);
+    pills[i].classList.remove('loading'); pills[i].classList.add('ready');
+  });
+  loaded=[true,true,true];
+  if(pendingReveal) reveal();
+  go=function(i){ /* 폴백: 크로스페이드 */
+    if(!revealed||i===cur) return;
+    imgs[cur].classList.remove('show');
+    imgs[i].classList.add('show');
+    pills.forEach(function(p,k){ p.classList.toggle('on',k===i); });
+    setScrim(i); cur=i;
+  };
+}
+
+/* ===== 시작 ===== */
+if(initGL()){
+  resize();
+  requestAnimationFrame(frame);
+  loadScene(startIdx,function(){
+    canvas.classList.add('ready');
+    if(pendingReveal) reveal();
+    if(canHD()) upgradeScene(startIdx);
+    /* 나머지 씬 백그라운드 프리로드 → 완료되면 HD 승격 */
+    SCENES.forEach(function(s,i){
+      if(i!==startIdx) loadScene(i,function(){ if(canHD()) upgradeScene(i); });
+    });
+  });
+}else{
+  initFallback();
+}
+})();
+</script>
+</body>
+</html>
