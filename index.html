@@ -120,15 +120,17 @@
     #brand img{height:26px;}
     /* 줌 버튼 숨김: 핀치·더블탭으로 대체 */
     #zoomCtrl{display:none;}
-    /* 캡션: 골드 라인 포인트 + 크고 또렷하게, 색상 카드 패널에 가리지 않게 위로 */
-    #caption{left:18px;bottom:182px;border-left:3px solid #d4af6a;padding-left:14px;}
+    /* 색상 카드: 좌측 상단으로 (임베드 시 JS가 헤더 높이만큼 아래로 내림) */
+    #sel{position:fixed;top:14px;left:14px;}
+    /* 캡션: 골드 라인 포인트 + 크고 또렷하게 */
+    #caption{left:18px;bottom:104px;border-left:3px solid #d4af6a;padding-left:14px;}
     #caption .l1{font-size:10.5px;}
     #caption .l2{font-size:23px;font-weight:800;letter-spacing:-.02em;
       text-shadow:0 2px 14px rgba(0,0,0,.55);}
     #caption .l3{margin-top:7px;font-size:12.5px;color:rgba(255,255,255,.94);
       text-shadow:0 1px 8px rgba(0,0,0,.5);}
-    /* 우측 하단 전화/카카오 플로팅 버튼 영역(약 90px)을 피함 */
-    #bottom{flex-direction:column-reverse;align-items:flex-start;padding:14px 88px 18px 18px;gap:12px;}
+    /* 우측 하단 전화/카카오 플로팅 버튼 영역(약 90px)을 피하고, CTA를 살짝 위로 */
+    #bottom{flex-direction:column-reverse;align-items:flex-start;padding:14px 88px 30px 18px;gap:12px;}
     /* CTA: 사이트 헤더와 같은 골드 톤 */
     #cta{font-size:13.5px;font-weight:800;padding:13px 24px;color:#171512;
       background:linear-gradient(135deg,#e9cf9a,#c9a96e);
@@ -490,6 +492,10 @@ if(Q.get('nologo')) document.getElementById('brand').style.display='none';
       var el=document.getElementById(id);
       if(el) el.style.top=(base[id]+off)+'px';
     });
+  }
+  if(MOBILE){
+    /* 좌측 상단 색상 카드: 헤더 오버레이만큼 + 로고가 보이면 그 아래로 */
+    selEl.style.top=(14+off+(Q.get('nologo')?0:56))+'px';
   }
   if(Q.get('top')!==null&&!MOBILE) selEl.style.marginRight='96px';
 })();
