@@ -28,13 +28,18 @@
   2. 기존 히어로 섹션(제목+렌더 이미지)을 숨기거나 삭제
   3. 맨 위에 "코드" 위젯 추가 → 아래 코드 붙여넣기:
 
-<iframe src="https://cubionbiz-hash.github.io/tmc-hero/"
-  style="display:block;width:100%;height:calc(100vh - 76px);border:0;"
+<style>
+#tmc-hero-frame{display:block;width:100%;height:calc(100vh - 76px);border:0;}
+@media (max-width:768px){#tmc-hero-frame{height:calc(100vh - 52px);}}
+</style>
+<iframe id="tmc-hero-frame" src="https://cubionbiz-hash.github.io/tmc-hero/"
   allow="fullscreen" title="태민 큐비클 360 쇼룸"></iframe>
 
   4. 섹션 여백은 0으로, 폭은 "화면 전체(와이드)"로 설정
-  ※ 76px = 헤더 높이 추정치. 삽입 후 화면이 살짝 짧거나 길면
-     이 숫자만 조절하면 됩니다 (알려주시면 정확히 계산해 드림)
+  ※ 76px = PC 고정 헤더(#tmc-pc-header), 52px = 모바일 상단바(#tmc-topbar)
+     실측값 (2026-07-16). 헤더 디자인을 바꾸면 이 숫자만 조절.
+  ※ 헤더 로고와 히어로 좌측 상단 로고가 겹쳐 보이면
+     src 뒤에 ?nologo=1 을 붙이면 히어로 쪽 로고가 숨겨집니다.
 
 [수정이 필요할 때]
   index.html 이나 이미지를 고친 뒤 GitHub에서 같은 이름으로

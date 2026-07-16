@@ -463,6 +463,19 @@ document.getElementById('zout').addEventListener('click',function(){
   setHfovTarget(hfovTarget+15*Math.PI/180); lastInteract=performance.now();
 });
 if(Q.get('nologo')) document.getElementById('brand').style.display='none';
+/* ?top=N : 사이트 헤더가 히어로 위에 겹칠 때 상단 UI를 N px 아래로,
+   임베드 시 우측 하단 플로팅 버튼(전화/카카오)과 겹치지 않게 셀렉터를 왼쪽으로 */
+(function(){
+  var off=parseInt(Q.get('top')||'0',10)||0;
+  if(off>0&&!MOBILE){
+    var base={brand:20,badge:18,zoomCtrl:64};
+    Object.keys(base).forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.style.top=(base[id]+off)+'px';
+    });
+  }
+  if(Q.get('top')!==null&&!MOBILE) selEl.style.marginRight='96px';
+})();
 
 /* ===== 리빌 ===== */
 var armed=false, moved=0, pmX=null, pmY=null, pendingReveal=false;
