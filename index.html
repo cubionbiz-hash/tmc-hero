@@ -74,19 +74,24 @@
     display:flex;align-items:center;justify-content:center;user-select:none;}
   .zb:hover{border-color:#e5c58a;}
   #caption{position:absolute;left:26px;bottom:112px;z-index:6;transition-delay:.25s;}
-  #caption .l1{font-size:10.5px;letter-spacing:3.5px;color:#e5c58a;font-weight:700;}
-  #caption .l2{margin-top:9px;font-size:clamp(16px,2.4vw,22px);font-weight:700;
-    text-shadow:0 2px 16px rgba(0,0,0,.45);}
-  #caption .l3{margin-top:8px;font-size:clamp(11.5px,1.4vw,13px);font-weight:500;
-    color:rgba(255,255,255,.78);text-shadow:0 1px 10px rgba(0,0,0,.4);}
+  #caption .l1{font-size:10.5px;letter-spacing:4px;color:#e5c58a;font-weight:700;}
+  #caption .rule{width:36px;height:2px;margin-top:11px;
+    background:linear-gradient(90deg,#e5c58a,rgba(229,197,138,.12));}
+  #caption .l2{margin-top:13px;font-size:clamp(20px,2.9vw,30px);font-weight:750;
+    line-height:1.34;letter-spacing:-.015em;text-shadow:0 2px 18px rgba(0,0,0,.5);}
+  #caption .l2 em{font-style:normal;color:#e5c58a;}
+  #caption .l3{margin-top:11px;font-size:clamp(11.5px,1.4vw,13.5px);font-weight:500;
+    letter-spacing:.4px;color:rgba(255,255,255,.8);text-shadow:0 1px 10px rgba(0,0,0,.4);}
   #bottom{position:absolute;left:0;right:0;bottom:0;z-index:6;
     display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
     padding:18px 26px 22px;transition-delay:.45s;}
   #cta{display:inline-flex;align-items:center;gap:8px;
-    background:linear-gradient(135deg,#e9cf9a,#c9a96e);
-    color:#171512;font-size:13.5px;font-weight:800;padding:12px 24px;
-    border-radius:99px;text-decoration:none;white-space:nowrap;
-    box-shadow:0 6px 18px rgba(0,0,0,.35);}
+    background:rgba(24,19,12,.52);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(229,197,138,.8);
+    color:#f3e8d2;font-size:13.5px;font-weight:700;letter-spacing:1px;padding:14px 28px;
+    border-radius:0;text-decoration:none;white-space:nowrap;transition:.25s;}
+  #cta:hover{background:linear-gradient(135deg,#e9cf9a,#c9a96e);color:#171512;
+    border-color:transparent;}
   /* ---- 조작 가이드 칩 (하단 중앙, 리빌 후 잠시 표시) ---- */
   #guide{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:6;
     display:flex;gap:8px;transition-delay:.6s;}
@@ -127,9 +132,10 @@
     /* 캡션: 골드 라인 포인트 + 크고 또렷하게 */
     #caption{left:18px;bottom:104px;border-left:3px solid #d4af6a;padding-left:14px;}
     #caption .l1{font-size:10.5px;}
-    #caption .l2{font-size:23px;font-weight:800;letter-spacing:-.02em;
+    #caption .rule{display:none;}
+    #caption .l2{margin-top:9px;font-size:24px;font-weight:800;letter-spacing:-.02em;
       text-shadow:0 2px 14px rgba(0,0,0,.55);}
-    #caption .l3{margin-top:7px;font-size:12.5px;color:rgba(255,255,255,.94);
+    #caption .l3{margin-top:8px;font-size:12.5px;color:rgba(255,255,255,.94);
       text-shadow:0 1px 8px rgba(0,0,0,.5);}
     /* 우측 하단 전화/카카오 플로팅 버튼 영역(약 90px)을 피하고, CTA를 살짝 위로 */
     #bottom{flex-direction:column-reverse;align-items:flex-start;padding:14px 88px 30px 18px;gap:12px;}
@@ -157,12 +163,13 @@
     <button class="zb" id="zout" title="축소">−</button>
   </div>
   <div id="caption" class="post">
-    <div class="l1">TAEMIN CUBICLE — 360° SHOWROOM</div>
-    <div class="l2">화장실은, 건물의 첫인상이 됩니다</div>
-    <div class="l3">20년 이상의 화장실 칸막이 전문기업 태민큐비클</div>
+    <div class="l1">360° SHOWROOM</div>
+    <div class="rule"></div>
+    <div class="l2">화장실 칸막이,<br><em>태민 큐비클</em>입니다.</div>
+    <div class="l3">20년 이상 11,000여 현장 경험이 있는 전문 기업 태민큐비클</div>
   </div>
   <div id="bottom" class="post">
-    <a id="cta" href="https://tmcubicle.kr/Contact" target="_top">화장실 칸막이(큐비클) 문의하기 →</a>
+    <a id="cta" href="https://tmcubicle.kr/Contact" target="_top">견적 문의 →</a>
     <div id="sel"></div>
   </div>
   <div id="guide" class="post">
